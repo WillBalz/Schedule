@@ -1,0 +1,196 @@
+package Package1;
+
+import java.util.ArrayList;
+
+public class Schedule extends Object {
+
+	protected static ArrayList<String> academics = new ArrayList<String>();
+	protected static ArrayList<String> electives = new ArrayList<String>();
+	protected static String name;
+
+	public Schedule(ArrayList<String> a, ArrayList<String> e, String n) {
+		academics = a;
+		electives = e;
+		name = n;
+
+	}
+
+	public static ArrayList<String> getFullSchedule(Schedule x) {
+		ArrayList<String> FS = new ArrayList<String>();
+		for (int k = 0; k < academics.size(); k++) {
+			FS.add(academics.get(k));
+		}
+		for (int lcv = 0; lcv < electives.size(); lcv++) {
+			FS.add(electives.get(lcv));
+		}
+		return FS;
+	}
+
+	static int nS = 5; // PLACEHOLDER OBV
+	static ArrayList<Schedule> studentSchedules = new ArrayList<Schedule>();
+	String[][] S = new String[5][8];
+	String[][] M = new String[][] { { "A", "B", "C", "A", "B", "C", "A", "B" },
+			{ "C", "A", "B", "C", "A", "B", "C", "E" }, { "D", "B", "F", "E", "G", "D", "H", "F" },
+			{ "H", "G", "D", "F", "E", "H", "E", "G" }, { "F", "E", "G", "H", "D", "F", "G", "D" } };
+			
+	String[] simpleSchedule = new String[] { "A", "B", "C", "D", "E", "F", "G", "H" };
+
+	public static ArrayList<String> findSimilarity(Schedule a, Schedule b) {
+		// returns array with positions of similarities with 0th index number of
+		// similarities
+
+		ArrayList<Integer> hold = new ArrayList<Integer>();
+		ArrayList<String> sharedClasses = new ArrayList<String>();
+		for (int j = 0; j < studentSchedules.size(); j++) {
+			if (getFullSchedule(a).indexOf(getFullSchedule(b).get(j)) > -1) {
+
+				hold.add((getFullSchedule(a).indexOf(getFullSchedule(b).get(j))));
+				sharedClasses.add(getFullSchedule(b).get(j));
+			}
+		}
+
+		return sharedClasses;
+	}
+
+	public static ArrayList<String> reportSimilarityData(ArrayList<Schedule> x) {
+		ArrayList<String> rt = new ArrayList<String>();
+		ArrayList<String> tempList = new ArrayList<String>();
+		ArrayList<String> actRT = new ArrayList<String>();
+		for (int i = 0; i < x.size(); i++) {
+			for (int j = 0; j < x.size(); j++) {
+				rt.addAll(findSimilarity(x.get(i), x.get(j)));
+			}
+		}
+		for (int lcv = 0; lcv < rt.size(); lcv++) {
+			
+			String tempClass = rt.get(0);
+
+			for (int k = 0; k < rt.size(); k++) {
+	
+				if (rt.get(0) == rt.get(k)) {
+					tempList.add(rt.remove(k));
+				}
+				if (k == rt.size() - 1) {
+					actRT.add(tempList.get(0));
+					actRT.add(tempList.size() + "");
+					tempList.clear();
+					// adds the class name and the amount of times it showed up across all schedules
+					// ok like maybe redundant but whatever
+				}
+			}
+		}
+		// add every single shared class list to a single ArrayList by calling the
+		// findSimilarity method.
+		// use ArrayList1.addAll(ArrayList2); to add together the ArrayLists from every
+		// call.
+		// then take the first element and add up the number of times it shows up in the
+		// entire list, removing each time.
+		// do not forget about delete skip bug
+		// divide the numbers by two
+		// add them to a new ArrayList next to the string that just was removed
+		// repeat this process until the list is empty.
+
+		// take list of student schedules and count how many times they have a shared
+		// class. use
+		// findSimilarity to find shared classes of groups of 2 and then expand somehow
+		return actRT; 
+	}
+
+	public static void initiateBlockSpace(String subject, String numberOfStudents, ArrayList<String> k) {
+		int numberOfSections = 0;
+		int numberOfStudents1 = Integer.valueOf(numberOfStudents);
+		if (numberOfStudents1 % 25 == 0) {
+			numberOfSections = numberOfStudents1 / 25;
+		}
+		else if (numberOfStudents1 % 25 != 0 && numberOfStudents1 % 25 >= 15) {
+			numberOfSections = numberOfStudents1 / 25 + 1;
+		}
+		else if (numberOfStudents1 % 25 != 0 && numberOfStudents1 % 25 < 15) {
+			numberOfSections = numberOfStudents1 % 25; 
+		}
+		
+		k.add(subject + ": " + numberOfSections);
+	}
+
+	public static String reportRequestData(ArrayList<Schedule> masterListStudents1) {
+
+		ArrayList<String> coursesInDemand = new ArrayList<String>();
+		ArrayList<Integer> coursesInDemandNumber = new ArrayList<Integer>();
+		ArrayList<String> courseIndexAssignment = new ArrayList<String>();
+		for (int l = 0; l < masterListStudents1.size(); l++) {
+			for (int g = 0; g < getFullSchedule(masterListStudents1.get(l)).size(); g++) {
+
+				if (coursesInDemand.indexOf(getFullSchedule(masterListStudents1.get(l)).get(g)) == -1) {
+
+					coursesInDemand.add(getFullSchedule(masterListStudents1.get(l)).get(g));
+					coursesInDemandNumber.add(coursesInDemand.size(), 1);
+					courseIndexAssignment.add(coursesInDemand.size() + "");
+					courseIndexAssignment.add(getFullSchedule(masterListStudents1.get(l)).get(g));
+				} else if (coursesInDemand.indexOf(getFullSchedule(masterListStudents1.get(l)).get(g)) > -1) {
+					coursesInDemandNumber.set(
+							(courseIndexAssignment.indexOf(getFullSchedule(masterListStudents1.get(l)).get(g))) - 1,
+							(coursesInDemandNumber.get(
+									courseIndexAssignment.indexOf(getFullSchedule(masterListStudents1.get(l)).get(g)))
+									- 1) + 1);
+				}
+			}
+		}
+		String str = "";
+		for (int r = 0; r < coursesInDemand.size(); r++) {
+			str = str + coursesInDemand.get(r) + " " + coursesInDemandNumber.get(r) + ", ";
+		}
+
+		return str;
+
+	}
+	
+	public static ArrayList<String> doAllocation(ArrayList<Schedule> y, ArrayList<String> rtl) {
+		// look at the list because it takes in the schedule ArrayList and spits out 
+		// a list of the courses and how many students are enrolled
+		// then call initiateBlockSpace
+		ArrayList<String> placeHolder = new ArrayList<String>();
+		
+		for (int i = 0; i < reportSimilarityData(y).size() - 1; i++) {
+			initiateBlockSpace(reportSimilarityData(y).get(i),reportSimilarityData(y).get(i+1), placeHolder);
+		}
+		rtl = placeHolder;
+		return rtl;
+	}
+
+	public static void main(String[] args) {
+		// compare everyone to everyone
+
+		// return a list or something with the highest scores and who got
+		// what with whom
+		// like print every combo and their score next to the two ppl
+
+		// maybe reduce it to half. or like take the top scores
+		// according to when the dropoff is.
+		// then do some more indexOf to see what courses these people want
+		// then take each like course and like add 1 to the number of sections
+		// EI0GWEGHIA this seems risky and trashy.
+
+		// you could also go like if they have more than 3 classes in common
+		// then assign them 3 blocks for those respective classes
+
+		// also u can search and see if there is a similarity of up to 25 people
+		// and make a new section for it
+		
+		ArrayList<Schedule> masterSimilarityData = new ArrayList<Schedule>();
+		ArrayList<Schedule> student1 = new ArrayList<Schedule>();
+		ArrayList<String> printing = new ArrayList<String>();
+		// now scan all of the masterSimilarityData's 3rd indices
+		// and we will record the frequency of each number
+		// do with this what you want im done for tonight
+
+		// but this should be a reasonable start for
+		// being able to find patterns and such with starting out
+		// finding large quantities of similarity. this is a long process.
+		reportSimilarityData(masterSimilarityData);
+		doAllocation(student1, printing);
+		
+		// make a new system to count up every block and the number of requests for it
+
+		// NOW MAKE A METHOD TO FIND OUT WHAT THE COURSES ARE THAT ARE SHARED
+	}
+}
